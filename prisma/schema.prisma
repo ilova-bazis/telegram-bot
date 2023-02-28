@@ -19,11 +19,12 @@ model Admin {
 }
 
 model Person {
-  id        Int @id @default(autoincrement())
-  name      String
-  order     Int 
-  ts        DateTime
-  current    Boolean @default(false)
+  id          Int @id @default(autoincrement())
+  name        String
+  order       Int 
+  ts          DateTime
+  current     Boolean @default(false)
+  channel_id  Int
 }
 
 model Completed {

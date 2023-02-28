@@ -25,6 +25,9 @@ bot.command('list', async (ctx) => {
     const people = await prisma.person.findMany({
         orderBy: {
             order: "asc"
+        },
+        where: {
+            channel_id: ctx.message.chat.id
         }
     })
     var list = ""
@@ -46,7 +49,8 @@ bot.command('remove',async (ctx) => {
     const name = arr.join(" ")
     const person = await prisma.person.findFirst({
         where: {
-            name: name
+            name: name,
+            channel_id: ctx.message.chat.id
         }
     })
     if(person) {
@@ -76,7 +80,8 @@ bot.command('setorder', async (ctx) => {
     const name = arr.join(" ")
     const person = await prisma.person.findFirst({
         where: {
-            name: name
+            name: name,
+            channel_id: ctx.message.chat.id
         }
     })
     if(!person) {
@@ -89,7 +94,8 @@ bot.command('setorder', async (ctx) => {
     }
     const people = await prisma.person.findMany({
         where: {
-            id: { not: person.id }
+            id: { not: person.id },
+            channel_id: ctx.message.chat.id
         },
         orderBy: {
             order: "asc"
@@ -134,7 +140,8 @@ bot.command('setcurrent', async (ctx)=> {
     const name = arr.join(" ")
     const person = await prisma.person.findFirst({
         where: {
-            name: name
+            name: name,
+            channel_id: ctx.message.chat.id
         }
     })
     if(!person) {
@@ -143,7 +150,10 @@ bot.command('setcurrent', async (ctx)=> {
     }
     await prisma.person.updateMany({
         data: {
-            current: false
+            current: false,
+        },
+        where: {
+            channel_id: ctx.message.chat.id
         }
     })
     await prisma.person.update({
@@ -160,7 +170,8 @@ bot.command('setcurrent', async (ctx)=> {
 bot.command('current', async (ctx) => {
     const person = await prisma.person.findFirst({
         where: {
-            current: true
+            current: true,
+            channel_id: ctx.message.chat.id
         }
     })
     if(person ) {
@@ -174,6 +185,9 @@ bot.command('next', async (ctx)=> {
     const people = await prisma.person.findMany({
         orderBy: {
             order: "asc"
+        },
+        where: {
+            channel_id: ctx.message.chat.id
         }
     });
     // console.log(people)
@@ -191,11 +205,11 @@ bot.command('add', async (ctx) => {
         return 
     }
     const name = arr.join(" ")
-    if(await prisma.person.findFirst({where: { name: name}})) {
+    if(await prisma.person.findFirst({where: { name: name, channel_id: ctx.message.chat.id}})) {
         await ctx.reply("This name already in the list")
         return 
     }
-    const people = await prisma.person.findMany()
+    const people = await prisma.person.findMany({where: { channel_id: ctx.message.chat.id }})
     const order = people.reduce((res, next)=> {
         if(next.order > res) {
             return next.order
@@ -207,7 +221,8 @@ bot.command('add', async (ctx) => {
         data:{
             name: name,
             order: order + 1,
-            ts: new Date()
+            ts: new Date(),
+            channel_id: ctx.message.chat.id
         }
     })
     ctx.reply("Success. Added " + name + " with order number " + (order + 1))
