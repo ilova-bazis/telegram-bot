@@ -24,7 +24,7 @@ model Person {
   order       Int 
   ts          DateTime
   current     Boolean @default(false)
-  channel_id  Int
+  channel_id  BigInt
 }
 
 model Completed {
